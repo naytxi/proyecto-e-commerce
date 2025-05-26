@@ -1,24 +1,38 @@
 'use strict';
-const {
-  Model
-} = require('sequelize');
+const { Model } = require('sequelize');
+
 module.exports = (sequelize, DataTypes) => {
-  class categoryproductos extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
+  class categoryproducto extends Model {
     static associate(models) {
-      // define association here
+
     }
   }
-  categoryproductos.init({
-    categoriesId: DataTypes.INTEGER,
-    productosID: DataTypes.INTEGER
+
+  categoryproducto.init({
+    productoId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'productos',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    },
+    categoryId: {
+      type: DataTypes.INTEGER,
+      references: {
+        model: 'categories',
+        key: 'id',
+      },
+      onDelete: 'CASCADE',
+      onUpdate: 'CASCADE',
+    }
   }, {
     sequelize,
-    modelName: 'categoryproductos',
+    modelName: 'categoryproducto', 
+    tableName: 'categoryproductos', 
+    timestamps: false 
   });
-  return categoryproductos;
+
+  return categoryproducto;
 };
