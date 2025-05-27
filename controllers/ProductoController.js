@@ -6,6 +6,11 @@ const ProductoController = {
   async create(req, res) {
     const { name, price, categoryIds } = req.body
 
+ if (!name || !price || !categoryIds) {
+    return res.status(400).json({
+      message: 'Todos los campos son obligatorios.'
+    });
+  }
     try {
       const producto = await Producto.create({ name, price })
       await producto.addCategories(categoryIds)
