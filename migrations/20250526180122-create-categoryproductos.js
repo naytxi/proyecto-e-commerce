@@ -9,11 +9,23 @@ module.exports = {
         primaryKey: true,
         type: Sequelize.INTEGER
       },
-      categoriesId: {
-        type: Sequelize.INTEGER
+      categoryId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'categories',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
-      productosID: {
-        type: Sequelize.INTEGER
+      productoId: {
+        type: Sequelize.INTEGER,
+        references: {
+          model: 'productos',
+          key: 'id'
+        },
+        onUpdate: 'CASCADE',
+        onDelete: 'CASCADE'
       },
       createdAt: {
         allowNull: false,
@@ -25,6 +37,7 @@ module.exports = {
       }
     });
   },
+
   async down(queryInterface, Sequelize) {
     await queryInterface.dropTable('categoryproductos');
   }
