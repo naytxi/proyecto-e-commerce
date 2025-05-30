@@ -1,9 +1,9 @@
-const { category, producto } = require('../models');
+const { Category, Producto } = require('../models');
 
 const CategoryController = {
   async create(req, res) {
     try {
-      const newCategory = await category.create(req.body);
+      const newCategory = await Category.create(req.body);
       res.status(201).send({ message: 'Categoría creada', newCategory });
     } catch (error) {
       res.status(500).send({ message: 'Error al crear categoría', error });
@@ -12,11 +12,12 @@ const CategoryController = {
 
   async getAll(req, res) {
     try {
-      const categories = await category.findAll({
-        include: [{ model: producto, as: 'productos' }]
+      const categories = await Category.findAll({
+        include: [{ model: Producto, as: 'productos' }]
       });
       res.send(categories);
     } catch (error) {
+      console.error(error); 
       res.status(500).send({ message: 'Error al obtener categorías', error });
     }
   },
