@@ -2,11 +2,11 @@ const { Category, Producto } = require('../models');
 
 const CategoryController = {
   async create(req, res) {
-  try {
+    try {
     const { name } = req.body;
 
     if (!name) {
-      return res.status(400).json({ message: 'El campo \"name\" es obligatorio' });
+      return res.status(400).json({ message: 'El campo "name" es obligatorio' });
     }
 
     const existente = await Category.findOne({ where: { name } });
@@ -22,7 +22,6 @@ const CategoryController = {
   }
 },
 
-
   async getAll(req, res) {
     try {
       const categories = await Category.findAll({
@@ -30,6 +29,7 @@ const CategoryController = {
       });
       res.send(categories);
     } catch (error) {
+      console.error(error); 
       res.status(500).send({ message: 'Error al obtener categorías', error });
     }
   },

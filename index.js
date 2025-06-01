@@ -11,7 +11,6 @@ const categoriaRoutes = require('./routes/CategoriaRoutes');
 
 app.use('/categories', categoriaRoutes); 
 
-
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
