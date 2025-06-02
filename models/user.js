@@ -1,26 +1,66 @@
-'use strict';
-const {
-  Model
-} = require('sequelize');
+'use strict'
+const { Model } = require('sequelize')
+const bcrypt = require('bcrypt')
+
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
-    /**
-     * Helper method for defining associations.
-     * This method is not a part of Sequelize lifecycle.
-     * The `models/index` file will call this method automatically.
-     */
     static associate(models) {
-      // define association here
+      // User.hasMany(models.Pedido) // lo usaremos más adelante
+    }
+
+    // Método para comparar contraseñas
+    validPassword(password) {
+      return bcrypt.compareSync(password, this.password)
     }
   }
+
   User.init({
-    name: DataTypes.STRING,
-    email: DataTypes.STRING,
-    password: DataTypes.STRING,
-    role: DataTypes.STRING
+    name: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        notEmpty: { msg: 'El nombre es obligatorio' }
+      }
+    },
+    email: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+      validate: {
+        isEmail: { msg: 'Debe ser un email válido' },
+        notEmpty: { msg: 'El email no puede estar vacío' }
+      }
+    },
+    password: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      validate: {
+        len: {
+          args: [6, 100],
+          msg: 'La contraseña debe tener al menos 6 caracteres'
+        }
+      }
+    },
+    role: {
+      type: DataTypes.STRING,
+      defaultValue: 'user',
+      validate: {
+        isIn: {
+          args: [['user', 'admin']],
+          msg: 'El rol debe ser user o admin'
+        }
+      }
+    }
   }, {
     sequelize,
     modelName: 'User',
-  });
-  return User;
-};
+    hooks: {
+      beforeCreate: async (user) => {
+        const hash = await bcrypt.hash(user.password, 10)
+        user.password = hash
+      }
+    }
+  })
+
+  return User
+}

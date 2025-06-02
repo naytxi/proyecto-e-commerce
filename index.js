@@ -8,8 +8,11 @@ const productoRoutes = require('./routes/ProductoRoutes');
 app.use('/productos', productoRoutes); 
 
 const categoriaRoutes = require('./routes/CategoriaRoutes');
-
 app.use('/categories', categoriaRoutes); 
+
+const userRoutes = require('./routes/UserRoutes')
+app.use('/users', userRoutes)
+
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

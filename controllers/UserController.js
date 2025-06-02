@@ -1,0 +1,60 @@
+const { User } = require('../models')
+const jwt = require('jsonwebtoken')
+const bcrypt = require('bcrypt')
+
+const UserController = {
+  // Registrar un nuevo usuario
+  async register(req, res) {
+    try {
+      const { name, email, password, role } = req.body
+
+      // Verificar que no exista el usuario
+      const existe = await User.findOne({ where: { email } })
+      if (existe) {
+        return res.status(400).json({ message: 'El email ya está registrado' })
+      }
+
+      const newUser = await User.create({ name, email, password, role })
+      res.status(201).json({
+        message: 'Usuario registrado con éxito',
+        user: {
+          id: newUser.id,
+          name: newUser.name,
+          email: newUser.email,
+          role: newUser.role
+        }
+      })
+    } catch (error) {
+      res.status(500).json({ message: 'Error al registrar usuario', error: error.message })
+    }
+  },
+
+  // Login
+  async login(req, res) {
+    try {
+      const { email, password } = req.body
+
+      const user = await User.findOne({ where: { email } })
+      if (!user) {
+        return res.status(404).json({ message: 'Usuario no encontrado' })
+      }
+
+      const passwordValida = await bcrypt.compare(password, user.password)
+      if (!passwordValida) {
+        return res.status(401).json({ message: 'Contraseña incorrecta' })
+      }
+
+      const token = jwt.sign(
+        { userId: user.id, role: user.role },
+        'secreto123', // clave secreta (en .env después)
+        { expiresIn: '1h' }
+      )
+
+      res.json({ message: 'Login exitoso', token })
+    } catch (error) {
+      res.status(500).json({ message: 'Error en login', error: error.message })
+    }
+  }
+}
+
+module.exports = UserController
