@@ -11,13 +11,13 @@ module.exports = (sequelize, DataTypes) => {
         as: 'usuario'
       })
 
-      // Un pedido puede tener muchos productos (más adelante)
-      // Pedido.belongsToMany(models.Producto, {
-      //   through: 'pedido_productos',
-      //   foreignKey: 'pedidoId',
-      //   otherKey: 'productoId',
-      //   as: 'productos'
-      // })
+      Pedido.belongsToMany(models.Producto, {
+        through: models.PedidoProducto,
+        foreignKey: 'pedidoId',
+        otherKey: 'productoId',
+        as: 'productos'
+})
+
     }
   }
 
