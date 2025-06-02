@@ -24,6 +24,10 @@ router.get('/admin-only', isAuth, isAdmin, (req, res) => {
 // router.get('/', isAuth, isAdmin, UserController.getAll)
 router.get('/', isAuth, isAdmin, UserController.getAll)
 
+// router...
+router.post('/logout', isAuth, UserController.logout)
+
+
 
 module.exports = router
 
