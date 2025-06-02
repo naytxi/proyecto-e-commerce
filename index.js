@@ -8,7 +8,6 @@ const productoRoutes = require('./routes/ProductoRoutes');
 app.use('/productos', productoRoutes); 
 
 const categoriaRoutes = require('./routes/CategoriaRoutes');
-
 app.use('/categories', categoriaRoutes); 
 
 const pedidosRoutes = require('./routes/PedidoRoutes');
