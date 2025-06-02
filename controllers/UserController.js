@@ -8,7 +8,6 @@ const UserController = {
     try {
       const { name, email, password, role } = req.body
 
-      // Verificar que no exista el usuario
       const existe = await User.findOne({ where: { email } })
       if (existe) {
         return res.status(400).json({ message: 'El email ya está registrado' })
@@ -46,13 +45,25 @@ const UserController = {
 
       const token = jwt.sign(
         { userId: user.id, role: user.role },
-        'secreto123', // clave secreta (en .env después)
+        'secreto123',
         { expiresIn: '1h' }
       )
 
       res.json({ message: 'Login exitoso', token })
     } catch (error) {
       res.status(500).json({ message: 'Error en login', error: error.message })
+    }
+  },
+
+  // Obtener todos los usuarios
+  async getAll(req, res) {
+    try {
+      const users = await User.findAll({
+        attributes: ['id', 'name', 'email', 'role', 'createdAt']
+      })
+      res.json(users)
+    } catch (error) {
+      res.status(500).json({ message: 'Error al obtener usuarios', error: error.message })
     }
   }
 }
