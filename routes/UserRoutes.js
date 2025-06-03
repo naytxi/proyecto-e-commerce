@@ -24,8 +24,11 @@ router.get('/admin-only', isAuth, isAdmin, (req, res) => {
 // router.get('/', isAuth, isAdmin, UserController.getAll)
 router.get('/', isAuth, isAdmin, UserController.getAll)
 
-// router...
+// // Cerrar sesión (logout)
 router.post('/logout', isAuth, UserController.logout)
+
+// Obtener perfil del usuario con sus pedidos y productos
+router.get('/profile', isAuth, UserController.profile)
 
 
 

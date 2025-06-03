@@ -89,7 +89,30 @@ const UserController = {
     } catch (error) {
       res.status(500).json({ message: 'Error al cerrar sesión', error: error.message })
     }
+  },
+  async profile(req, res) {
+    try {
+      const user = await User.findByPk(req.user.userId, {
+        attributes: ['id', 'name', 'email', 'role'],
+        include: [
+          {
+            association: 'pedidos',
+            include: {
+           association: 'productos'
+          }
+        }
+      ]
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener perfil', error: error.message })
   }
+}
 
 }
 

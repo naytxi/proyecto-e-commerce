@@ -5,10 +5,12 @@ const bcrypt = require('bcrypt')
 module.exports = (sequelize, DataTypes) => {
   class User extends Model {
     static associate(models) {
-      // User.hasMany(models.Pedido) // lo usaremos más adelante
-    }
-
-    // Método para comparar contraseñas
+  User.hasMany(models.Pedido, {
+    foreignKey: 'usersId',
+    as: 'pedidos'
+  })
+}
+ // Método para comparar contraseñas
     validPassword(password) {
       return bcrypt.compareSync(password, this.password)
     }
