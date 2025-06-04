@@ -1,4 +1,4 @@
-const { User } = require('../models')
+const { User, Token } = require('../models') // <-- Importamos Token
 const jwt = require('jsonwebtoken')
 const bcrypt = require('bcrypt')
 
@@ -49,6 +49,9 @@ const UserController = {
         { expiresIn: '1h' }
       )
 
+      // Guardamos el token en la tabla Tokens
+      await Token.create({ userId: user.id, token })
+
       res.json({ message: 'Login exitoso', token })
     } catch (error) {
       res.status(500).json({ message: 'Error en login', error: error.message })
@@ -65,7 +68,52 @@ const UserController = {
     } catch (error) {
       res.status(500).json({ message: 'Error al obtener usuarios', error: error.message })
     }
+  },
+
+    // Logout
+   async logout(req, res) {
+    try {
+      const token = req.headers.authorization?.split(' ')[1]
+
+      if (!token) {
+        return res.status(400).json({ message: 'Token no proporcionado' })
+      }
+
+      const deleted = await Token.destroy({ where: { token } })
+
+      if (deleted) {
+        res.json({ message: 'Sesión cerrada correctamente' })
+      } else {
+        res.status(404).json({ message: 'Token no encontrado o ya eliminado' })
+      }
+    } catch (error) {
+      res.status(500).json({ message: 'Error al cerrar sesión', error: error.message })
+    }
+  },
+  async profile(req, res) {
+    try {
+      const user = await User.findByPk(req.user.userId, {
+        attributes: ['id', 'name', 'email', 'role'],
+        include: [
+          {
+            association: 'pedidos',
+            include: {
+           association: 'productos'
+          }
+        }
+      ]
+    })
+
+    if (!user) {
+      return res.status(404).json({ message: 'Usuario no encontrado' })
+    }
+
+    res.json(user)
+  } catch (error) {
+    res.status(500).json({ message: 'Error al obtener perfil', error: error.message })
   }
+}
+
 }
 
 module.exports = UserController
