@@ -11,7 +11,7 @@ Este proyecto es una aplicación backend para un sistema de comercio electrónic
 - **Node.js**: Plataforma de ejecución para JavaScript en el servidor.
 - **Express.js**: Framework para construir APIs REST.
 - **Sequelize**: ORM para manejar bases de datos SQL de forma sencilla.
-- **PostgreSQL/MySQL/SQLite** (ajustar según base de datos usada): Base de datos relacional para almacenar la información.
+- **MySQL** : Base de datos relacional para almacenar la información.
 - **JWT (JSON Web Token)**: Para autenticación y autorización segura.
 - **bcrypt**: Para hashear contraseñas de usuario.
 - **Multer**: Middleware para subir y manejar imágenes de productos.
