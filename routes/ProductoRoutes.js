@@ -3,12 +3,15 @@ const router = express.Router()
 const ProductoController = require('../controllers/ProductoController')
 const isAuth = require('../middlewares/auth')
 const isAdmin = require('../middlewares/isAdmin')
+const upload = require('../middlewares/upload')
 
-//Crear producto (solo admins)
-router.post('/', isAuth, isAdmin, ProductoController.create)
 
-//Actualizar producto (solo admins)
-router.put('/:id', isAuth, isAdmin, ProductoController.update) 
+
+// Crear producto con imagen
+router.post('/', isAuth, isAdmin, upload.single('image'), ProductoController.create)
+
+// Actualizar producto con imagen
+router.put('/:id', isAuth, isAdmin, upload.single('image'), ProductoController.update)
 
 //Eliminar producto (solo admins)
 router.delete('/:id', isAuth, isAdmin, ProductoController.delete)

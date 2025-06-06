@@ -31,7 +31,6 @@ fs
     db[model.name] = model; 
   });
 
-console.log("Modelos cargados:", Object.keys(db));
 
 Object.keys(db).forEach(modelName => {
   if (db[modelName].associate) {
