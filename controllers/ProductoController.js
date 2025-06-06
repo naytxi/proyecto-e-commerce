@@ -3,51 +3,56 @@ const { Op } = require('sequelize')
 
 const ProductoController = {
 
-  async create(req, res) {
-    const { name, price, categoryIds } = req.body
+ async create(req, res) {
+  const { name, price, categoryIds } = req.body
+  const image = req.file ? req.file.filename : null
 
- if (!name || !price || !categoryIds) {
+  if (!name || !price || !categoryIds) {
     return res.status(400).json({
       message: 'Todos los campos son obligatorios.'
     });
   }
-    try {
-      const producto = await Producto.create({ name, price })
-      await producto.addCategories(categoryIds)
 
-      const productoConCategorias = await Producto.findByPk(producto.id, {
-        include: { model: Category, as: 'categories' }
-      })
+  try {
+    const producto = await Producto.create({ name, price, image })
+    await producto.addCategories(categoryIds)
 
-      res.status(201).json(productoConCategorias)
-    } catch (error) {
-      res.status(500).json({ message: 'Error al crear producto', error: error.message })
+    const productoConCategorias = await Producto.findByPk(producto.id, {
+      include: { model: Category, as: 'categories' }
+    })
+
+    res.status(201).json(productoConCategorias)
+  } catch (error) {
+    res.status(500).json({ message: 'Error al crear producto', error: error.message })
+  }
+}
+,
+
+ async update(req, res) {
+  const { id } = req.params
+  const { name, price, categoryIds } = req.body
+  const image = req.file ? req.file.filename : null
+
+  try {
+    const producto = await Producto.findByPk(id)
+    if (!producto) return res.status(404).json({ message: 'Producto no encontrado' })
+
+    await producto.update({ name, price, image: image || producto.image })
+
+    if (Array.isArray(categoryIds)) {
+      await producto.setCategories(categoryIds)
     }
-  },
 
-  async update(req, res) {
-    const { id } = req.params
-    const { name, price, categoryIds } = req.body
+    const productoConCategorias = await Producto.findByPk(id, {
+      include: { model: Category, as: 'categories' }
+    })
 
-    try {
-      const producto = await Producto.findByPk(id)
-      if (!producto) return res.status(404).json({ message: 'Producto no encontrado' })
-
-      await producto.update({ name, price })
-
-      if (Array.isArray(categoryIds)) {
-        await producto.setCategories(categoryIds)
-      }
-
-      const productoConCategorias = await Producto.findByPk(id, {
-        include: { model: Category, as: 'categories' }
-      })
-
-      res.json(productoConCategorias)
-    } catch (error) {
-      res.status(500).json({ message: 'Error al actualizar producto', error: error.message })
-    }
-  },
+    res.json(productoConCategorias)
+  } catch (error) {
+    res.status(500).json({ message: 'Error al actualizar producto', error: error.message })
+  }
+}
+,
 
   async delete(req, res) {
     const { id } = req.params
