@@ -2,6 +2,7 @@ const express = require('express')
 const router = express.Router()
 const PedidoController = require('../controllers/PedidoController')
 const isAuth = require('../middlewares/auth') // Solo usuarios logueados pueden acceder
+const isAdmin = require('../middlewares/isAdmin')
 
 // Crear un nuevo pedido
 router.post('/', isAuth, PedidoController.create)
