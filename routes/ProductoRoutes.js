@@ -1,7 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const ProductoController = require('../controllers/ProductoController')
-
+const verificarToken = require('../auth/authMiddleware')
+const isAdmin = require('../middlewares/isAdmin')
 
 router.post('/', verificarToken, isAdmin, ProductoController.create);
 router.put('/:id', verificarToken, isAdmin, ProductoController.update);

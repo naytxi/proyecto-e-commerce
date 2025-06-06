@@ -10,7 +10,7 @@ module.exports = (sequelize, DataTypes) => {
       });
 
       Pedidos.belongsTo(models.User, {
-        foreignKey: 'usersId',
+        foreignKey: 'userId',
         as: 'usuario'
       });
     }
