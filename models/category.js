@@ -1,5 +1,5 @@
-'use strict'
-const { Model } = require('sequelize')
+'use strict';
+const { Model } = require('sequelize');
 
 module.exports = (sequelize, DataTypes) => {
   class Category extends Model {
@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
         through: models.CategoryProducto,
         as: 'productos',
         foreignKey: 'categoryId'
-      })
+      });
     }
   }
 
@@ -18,7 +18,7 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Category',
     tableName: 'categories'
-  })
+  });
 
-  return Category
-}
+  return Category;
+};
