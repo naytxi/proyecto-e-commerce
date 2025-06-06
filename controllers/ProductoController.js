@@ -1,4 +1,4 @@
-const { Producto, Category } = require('../models')
+const { Producto, Category, Review, User } = require('../models')
 const { Op } = require('sequelize')
 
 const ProductoController = {
@@ -73,7 +73,10 @@ const ProductoController = {
     try {
       const productos = await Producto.findAll({
         where,
-        include: { model: Category, as: 'categories' },
+        include: [
+           { model: Category, as: 'categories' },
+           { model: Review, as: 'reviews', include: { model: User, as: 'user', attributes: ['id', 'name'] } }
+      ],
         order: orden === 'desc' ? [['price', 'DESC']] : orden === 'asc' ? [['price', 'ASC']] : undefined
       })
 
@@ -88,8 +91,11 @@ const ProductoController = {
 
     try {
       const producto = await Producto.findByPk(id, {
-        include: { model: Category, as: 'categories' }
-      })
+        include: [
+           { model: Category, as: 'categories' },
+           { model: Review, as: 'reviews', include: { model: User, as: 'user', attributes: ['id', 'name'] } }
+      ]
+      });
 
       res.json(producto)
     } catch (error) {

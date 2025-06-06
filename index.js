@@ -10,12 +10,14 @@ app.use('/productos', productoRoutes);
 const categoriaRoutes = require('./routes/CategoriaRoutes');
 app.use('/categories', categoriaRoutes); 
 
-const userRoutes = require('./routes/UserRoutes')
-app.use('/users', userRoutes)
+const pedidosRoutes = require('./routes/PedidoRoutes');
+app.use('/pedidos', pedidosRoutes);
 
-const pedidoRoutes = require('./routes/PedidoRoutes')
-app.use('/pedidos', pedidoRoutes)
+const usersRoutes = require('./routes/UserRoutes');
+app.use('/user', usersRoutes);
 
+const reviewRoutes = require('./routes/ReviewRoutes');
+app.use('/reviews', reviewRoutes);
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
