@@ -16,6 +16,9 @@ app.use('/pedidos', pedidosRoutes);
 const usersRoutes = require('./routes/UserRoutes');
 app.use('/user', usersRoutes);
 
+const reviewRoutes = require('./routes/ReviewRoutes');
+app.use('/reviews', reviewRoutes);
+
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
