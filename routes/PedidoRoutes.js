@@ -1,11 +1,11 @@
-const express = require('express')
-const router = express.Router()
-const PedidoController = require('../controllers/PedidoController')
-const isAuth = require('../middlewares/auth') // Solo usuarios logueados pueden acceder
-const isAdmin = require('../middlewares/isAdmin')
+const express = require('express');
+const router = express.Router();
+const { crearPedido, obtenerPedidos, obtenerPedidosUsuario  } = require('../controllers/PedidoController');
+const verificarToken = require('../auth/authMiddleware'); 
 
-// Crear un nuevo pedido
-router.post('/', isAuth, PedidoController.create)
+router.post('/', verificarToken, crearPedido); 
+router.get('/', obtenerPedidos);
+router.get('/usuario', verificarToken, obtenerPedidosUsuario);
 
 // Obtener los pedidos del usuario logueado
 router.get('/', isAuth, PedidoController.getUserPedidos)

@@ -31,6 +31,17 @@ router.post('/logout', isAuth, UserController.logout)
 router.get('/profile', isAuth, UserController.profile)
 
 
+router.get('/', getAllUsers);
+router.get('/me', verificarToken, obtenerPerfil);
+router.get('/:id', getUserById);
+router.post('/', createUser);
+router.put('/:id', updateUser);
+router.delete('/:id', deleteUser);
 
 module.exports = router
 
+router.post('/register', registrar);
+router.post('/login', login);
+router.post('/logout', logout);
+
+module.exports = router;

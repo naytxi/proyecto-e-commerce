@@ -8,9 +8,69 @@ const UserController = {
     try {
       const { name, email, password, role } = req.body
 
-      const existe = await User.findOne({ where: { email } })
-      if (existe) {
-        return res.status(400).json({ message: 'El email ya está registrado' })
+
+const registrar = async (req, res) => {
+  const { name, email, password, role } = req.body;
+
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ error: 'Todos los campos son obligatorios' });
+  }
+
+  try {
+    const userExistente = await User.findOne({ where: { email } });
+    if (userExistente) {
+      return res.status(409).json({ error: 'El email ya está en uso' });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const nuevoUsuario = await User.create({
+      name,
+      email,
+      password: hashedPassword,
+      role
+    });
+
+    res.status(201).json({ mensaje: 'Usuario creado correctamente', userId: nuevoUsuario.id });
+  } catch (err) {
+    console.error('Error en registrar:', err); 
+    res.status(500).json({ error: 'Error al registrar usuario' });
+  }
+};
+
+
+const login = async (req, res) => {
+  const { email, password } = req.body;
+
+  try {
+    const usuario = await User.findOne({ where: { email } });
+    if (!usuario) {
+      return res.status(404).json({ error: 'Usuario no encontrado' });
+    }
+
+    const valido = await bcrypt.compare(password, usuario.password);
+    if (!valido) {
+      return res.status(401).json({ error: 'Contraseña incorrecta' });
+    }
+
+    const token = jwt.sign({ id: usuario.id, role: usuario.role }, SECRET, { expiresIn: '1h' });
+    res.json({ mensaje: 'Login exitoso', token });
+  } catch (err) {
+    res.status(500).json({ error: 'Error en el login' });
+  }
+};
+
+
+const obtenerPerfil = async (req, res) => {
+  try {
+    const usuario = await User.findByPk(req.user.id, {
+      attributes: ['id', 'name', 'email', 'role'],
+      include: {
+        model: Pedidos,
+        as: 'pedidos',
+        include: {
+          model: Producto,
+          through: { attributes: ['cantidad'] }
+        }
       }
 
       const newUser = await User.create({ name, email, password, role })

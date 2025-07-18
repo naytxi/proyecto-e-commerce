@@ -1,10 +1,8 @@
 const express = require('express')
 const router = express.Router()
 const ProductoController = require('../controllers/ProductoController')
-const isAuth = require('../middlewares/auth')
+const verificarToken = require('../auth/authMiddleware')
 const isAdmin = require('../middlewares/isAdmin')
-const upload = require('../middlewares/upload')
-
 
 
 // Crear producto con imagen
