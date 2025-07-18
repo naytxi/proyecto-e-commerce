@@ -8,14 +8,20 @@ module.exports = (sequelize, DataTypes) => {
         through: models.CategoryProducto,
         as: 'categories',
         foreignKey: 'productoId'
-      })
+      });
 
       Producto.belongsToMany(models.Pedido, {
         through: 'PedidoProductos',
         foreignKey: 'productoId',
         otherKey: 'pedidoId',
         as: 'pedidos'
-      })
+      });
+
+      // ✅ Relación nueva con Review
+      Producto.hasMany(models.Review, {
+        as: 'reviews',
+        foreignKey: 'productoId'
+      });
     }
   }
 
@@ -27,10 +33,9 @@ module.exports = (sequelize, DataTypes) => {
     sequelize,
     modelName: 'Producto',
     tableName: 'productos'
-  })
+  });
 
-  return Producto
-}
-
+  return Producto;
+};
 
 
