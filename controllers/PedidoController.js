@@ -48,7 +48,32 @@ const obtenerPedidos = async (req, res) => {
   }
 };
 
+const obtenerPedidosUsuario = async (req, res) => {
+  try {
+    const usersId = req.user.id;
+
+    const pedidosUsuario = await Pedidos.findAll({
+      where: { usersId },
+      include: {
+        model: Producto,
+        attributes: ['id', 'name'],   
+        through: {
+          attributes: ['cantidad'],   
+        }
+      },
+      order: [['createdAt', 'DESC']]
+    });
+
+    res.json(pedidosUsuario);
+  } catch (error) {
+    console.error('Error obteniendo pedidos del usuario:', error);
+    res.status(500).json({ error: 'Error al obtener pedidos del usuario' });
+  }
+};
+
+
 module.exports = {
   crearPedido,
-  obtenerPedidos
+  obtenerPedidos,
+  obtenerPedidosUsuario 
 };
