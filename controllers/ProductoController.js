@@ -1,118 +1,142 @@
-const { Producto, Category, Review, User } = require('../models')
-const { Op } = require('sequelize')
+const { Producto, Category, Review, User } = require('../models');
+const { Op } = require('sequelize');
 
 const ProductoController = {
+  async create(req, res) {
+    const { name, price, categoryIds } = req.body;
 
- async create(req, res) {
-  const { name, price, categoryIds } = req.body
-  const image = req.file ? req.file.filename : null
-
-  if (!name || !price || !categoryIds) {
-    return res.status(400).json({
-      message: 'Todos los campos son obligatorios.'
-    });
-  }
-
-  try {
-    const producto = await Producto.create({ name, price, image })
-    await producto.addCategories(categoryIds)
-
-    const productoConCategorias = await Producto.findByPk(producto.id, {
-      include: { model: Category, as: 'categories' }
-    })
-
-    res.status(201).json(productoConCategorias)
-  } catch (error) {
-    res.status(500).json({ message: 'Error al crear producto', error: error.message })
-  }
-}
-,
-
- async update(req, res) {
-  const { id } = req.params
-  const { name, price, categoryIds } = req.body
-  const image = req.file ? req.file.filename : null
-
-  try {
-    const producto = await Producto.findByPk(id)
-    if (!producto) return res.status(404).json({ message: 'Producto no encontrado' })
-
-    await producto.update({ name, price, image: image || producto.image })
-
-    if (Array.isArray(categoryIds)) {
-      await producto.setCategories(categoryIds)
+    if (!name || !price || !Array.isArray(categoryIds)) {
+      return res.status(400).json({
+        message: 'Todos los campos son obligatorios.',
+      });
     }
 
-    const productoConCategorias = await Producto.findByPk(id, {
-      include: { model: Category, as: 'categories' }
-    })
+    try {
+      const producto = await Producto.create({ name, price });
+      await producto.addCategories(categoryIds);
 
-    res.json(productoConCategorias)
-  } catch (error) {
-    res.status(500).json({ message: 'Error al actualizar producto', error: error.message })
-  }
-}
-,
+      const productoConCategorias = await Producto.findByPk(producto.id, {
+        include: { model: Category, as: 'categories' },
+      });
 
-  async delete(req, res) {
-    const { id } = req.params
+      res.status(201).json(productoConCategorias);
+    } catch (error) {
+      console.error("ERROR EN create:", error);
+      res.status(500).json({ message: 'Error al crear producto', error: error.message });
+    }
+  }, // <--- ¡Esta llave de cierre es la que faltaba!
+
+  async update(req, res) {
+    const { id } = req.params;
+    const { name, price, categoryIds } = req.body;
 
     try {
-      const producto = await Producto.findByPk(id)
-      if (!producto) return res.status(404).json({ message: 'Producto no encontrado' })
+      const producto = await Producto.findByPk(id);
+      if (!producto) return res.status(404).json({ message: 'Producto no encontrado' });
 
-      await producto.destroy()
-      res.json({ message: 'Producto eliminado correctamente' })
+      await producto.update({ name, price });
+
+      if (Array.isArray(categoryIds)) {
+        await producto.setCategories(categoryIds);
+      }
+
+      const productoConCategorias = await Producto.findByPk(id, {
+        include: { model: Category, as: 'categories' },
+      });
+
+      res.json(productoConCategorias);
     } catch (error) {
-      res.status(500).json({ message: 'Error al eliminar producto', error: error.message })
+      console.error("ERROR EN update:", error);
+      res.status(500).json({ message: 'Error al actualizar producto', error: error.message });
+    }
+  },
+
+  async delete(req, res) {
+    const { id } = req.params;
+
+    try {
+      const producto = await Producto.findByPk(id);
+      if (!producto) return res.status(404).json({ message: 'Producto no encontrado' });
+
+      await producto.destroy();
+      res.json({ message: 'Producto eliminado correctamente' });
+    } catch (error) {
+      console.error("ERROR EN delete:", error);
+      res.status(500).json({ message: 'Error al eliminar producto', error: error.message });
     }
   },
 
   async getAll(req, res) {
-  const { name, price, orden } = req.query
-  let where = {}
+    const { name, price, orden } = req.query;
+    const where = {};
 
-  if (name) where.name = { [Op.like]: `%${name}%` }
-  if (price) where.price = price
+    if (name) where.name = { [Op.like]: `%${name}%` };
+    if (price) where.price = price;
 
-  try {
-    const productos = await Producto.findAll({
-      where,
-      include: [
-         { model: Category, as: 'categories' },
-        // { model: Review, as: 'reviews', include: { model: User, as: 'user', attributes: ['id', 'name'] } }
-    ],
-      order: orden === 'desc' ? [['price', 'DESC']] : orden === 'asc' ? [['price', 'ASC']] : undefined
-    })
+    try {
+      const productos = await Producto.findAll({
+        where,
+        include: [
+          { model: Category, as: 'categories' },
+          {
+            model: Review,
+            as: 'reviews',
+            include: {
+              model: User,
+              as: 'user', // <--- Corregido de 'usuario' a 'user'
+              attributes: ['id', 'name'],
+              required: false
+            }
+          }
+        ],
+        order:
+          orden === 'desc'
+            ? [['price', 'DESC']]
+            : orden === 'asc'
+            ? [['price', 'ASC']]
+            : undefined,
+      });
 
-  //se agrego para el proyecto 1 frontend
-   res.json({ products: productos })
-
-  } catch (error) {
-    res.status(500).json({ message: 'Error al obtener productos', error: error.message })
-  }
-},
-
-async getById(req, res) {
-  const { id } = req.params;
-
-  try {
-    const producto = await Producto.findByPk(id, {
-      include: [
-        { model: Category, as: 'categories' },
-        { model: Review, as: 'reviews', include: { model: User, as: 'user', attributes: ['id', 'name'] } }
-      ]
-    });
-
-    if (!producto) {
-      return res.status(404).json({ message: "Producto no encontrado" });
+      res.json(productos);
+    } catch (error) {
+      console.error("ERROR EN getAll:", error);
+      res.status(500).json({ message: 'Error al obtener productos', error: error.message });
     }
+  },
 
-    res.json(producto);
-  } catch (error) {
-    res.status(500).json({ message: "Error al obtener producto", error: error.message });
-  }
- }
-}
+  async getById(req, res) {
+    const { id } = req.params;
 
-module.exports = ProductoController
+    try {
+      const producto = await Producto.findByPk(id, {
+        include: [
+          { model: Category, as: 'categories' },
+          {
+            model: Review,
+            as: 'reviews',
+            include: {
+              model: User,
+              as: 'user', // <--- Corregido de 'usuario' a 'user'
+              attributes: ['id', 'name'],
+              required: false,
+            },
+          },
+        ],
+      });
+
+      if (!producto) {
+        return res.status(404).json({ message: 'Producto no encontrado' });
+      }
+
+      res.json(producto);
+    } catch (error) {
+      console.error("ERROR EN getById:", error);
+      res.status(500).json({
+        message: 'Error al obtener producto',
+        error: error.message,
+      });
+    }
+  },
+};
+
+module.exports = ProductoController;

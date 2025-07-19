@@ -26,7 +26,7 @@ const ReviewController = {
     try {
       const reviews = await Review.findAll({
         include: [
-          { model: User, as: 'user', attributes: ['id', 'name'] },
+          { model: User, as: 'usuario', attributes: ['id', 'name'] },
           { model: Producto, as: 'producto', attributes: ['id', 'name'] }
         ]
       });
