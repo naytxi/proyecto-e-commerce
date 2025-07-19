@@ -2,7 +2,7 @@ const { Pedidos, Producto, Pedidoproductos } = require('../models');
 
 const crearPedido = async (req, res) => {
   try {
-    const usersId = req.user.id; 
+    const usersId = req.user.id;
     const productosData = req.body.productos;
 
     if (!productosData || !Array.isArray(productosData) || productosData.length === 0) {
@@ -10,23 +10,34 @@ const crearPedido = async (req, res) => {
     }
 
     const nuevoPedido = await Pedidos.create({ usersId });
+ 
 
     for (const prod of productosData) {
-      if (!prod.id || !prod.cantidad) {
+      const { id, cantidad } = prod;
+
+      if (!id || !cantidad) {
         return res.status(400).json({ error: 'Cada producto debe tener id y cantidad' });
+      }
+
+      const productoExiste = await Producto.findByPk(id);
+
+      if (!productoExiste) {
+        return res.status(404).json({ error: `Producto con ID ${id} no encontrado` });
       }
 
       await Pedidoproductos.create({
         pedidoId: nuevoPedido.id,
-        productoId: prod.id,
-        cantidad: prod.cantidad
+        productoId: id,
+        cantidad
       });
+
     }
 
     return res.status(201).json({ mensaje: 'Pedido creado', pedidoId: nuevoPedido.id });
+
   } catch (error) {
-    console.error('Error creando pedido:', error);  
-    return res.status(500).json({ error: 'Error al crear el pedido' });
+    console.error('🟥 Error creando pedido:', error);
+    return res.status(500).json({ error: 'Error al crear el pedido', detalle: error.message });
   }
 };
 

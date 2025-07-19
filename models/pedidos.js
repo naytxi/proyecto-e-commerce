@@ -6,7 +6,8 @@ module.exports = (sequelize, DataTypes) => {
     static associate(models) {
       Pedidos.belongsToMany(models.Producto, {
         through: models.Pedidoproductos,
-        foreignKey: 'pedidoId'
+        foreignKey: 'pedidoId',
+        otherKey: 'productoId'
       });
 
       Pedidos.belongsTo(models.User, {
@@ -20,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
     usersId: DataTypes.INTEGER
   }, {
     sequelize,
-    modelName: 'Pedidos' 
+    modelName: 'Pedidos'
   });
 
   return Pedidos;
